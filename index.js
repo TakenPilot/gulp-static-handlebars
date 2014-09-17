@@ -1,11 +1,8 @@
 var gutil = require('gulp-util');
 var through = require('through2');
 var Handlebars = require('handlebars');
-var fs = require('fs');
 var Promise = require('bluebird');
 var _ = require('lodash');
-var vinyl = require('vinyl');
-var util = require('util');
 
 /**
  * Duck-typing to allow different promise implementations to work.

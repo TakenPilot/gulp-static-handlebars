@@ -14,8 +14,7 @@
     "gulp-util": "^3.0.1",
     "handlebars": "^2.0.0",
     "lodash": "^2.4.1",
-    "through2": "^0.6.1",
-    "vinyl": "^0.4.3"
+    "through2": "^0.6.1"
   },
   "devDependencies": {
     "chai": "^1.9.1",
