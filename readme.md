@@ -32,7 +32,7 @@ gulp.src('./app/index.hbs')
 gulp.src('./app/index.hbs')
       .pipe(handlebars({contents:"whatever"}, {
         helpers: gulp.src('./app/helpers/**/*.js'),
-        partials: gulp.src('./app/partials/**/*.js')
+        partials: gulp.src('./app/partials/**/*.hbs')
       }))
       .pipe(gulp.dest('./dist'));
 
