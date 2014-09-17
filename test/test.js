@@ -2,7 +2,8 @@ var fs = require('fs'),
   Promise = require('bluebird'),
   handlebars = require('../.'),
   sinon = require('sinon'),
-  expect = require('chai').expect;
+  expect = require('chai').expect,
+  gulp = require('gulp');
 
 describe('Gulp Static Handlebars', function () {
   it('should load helpers', function (done) {
@@ -54,13 +55,26 @@ describe('Gulp Static Handlebars', function () {
     deferred.resolve({contents: "Some dynamic content"});
   });
 
-  it('should return function', function (done) {
+  it('should load partials from pipe if available', function (done) {
     //arrange
-    var expectedContents = '<div>contents!!</div>';
+    var expectedContents = '<div>contents!!</div>\n<div><test>partial 1 contents!!</test></div>';
 
     //act
-    fs.createReadStream('./test/fixtures/test-data.html')
-      .pipe(handlebars({contents: "contents!!"}))
+    fs.createReadStream('./test/fixtures/test-data-with-partial.html')
+      .pipe(handlebars({contents: "contents!!"}, {partials: gulp.src('./test/fixtures/partials/**/*')}))
+      .on('data', function (data) {
+        expect(data).to.equal(expectedContents);
+        done();
+      });
+  });
+
+  it('should load helpers from pipe if available', function (done) {
+    //arrange
+    var expectedContents = '<div>contents!</div>\n<div>Imported Helper</div>';
+
+    //act
+    fs.createReadStream('./test/fixtures/test-data-with-helper.html')
+      .pipe(handlebars({contents: "contents!"}, {helpers: gulp.src('./test/fixtures/helpers/**/*')}))
       .on('data', function (data) {
         expect(data).to.equal(expectedContents);
         done();
