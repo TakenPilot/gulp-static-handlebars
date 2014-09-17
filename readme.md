@@ -3,11 +3,9 @@ Gulp Static Handlebars
 
 Reads partials and helpers from another source that can be asynchronous (like a database, file system, or promise).
 
-##Example:
+##Example with any A+ compatible promises library:
 
 ```JavaScript
-
-var Promise = require('bluebird'); //promise implementation library
 
 function getData() {
     return Promise.resolve({contents: 'whatever'});
@@ -27,7 +25,19 @@ gulp.src('./app/index.hbs')
       
 ```
 
+##Another example with vinyl pipes
+
+```JavaScript
+
+gulp.src('./app/index.hbs')
+      .pipe(handlebars({contents:"whatever"}, {
+        helpers: gulp.src('./app/helpers/**/*.js'),
+        partials: gulp.src('./app/partials/**/*.js')
+      }))
+      .pipe(gulp.dest('./dist'));
+
+```
+
 ##To Do:
 
-* Allow reading in of pipes (buffers, streams and vinyl) as well
 * Support more handlebars options
