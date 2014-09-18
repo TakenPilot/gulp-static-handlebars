@@ -72,8 +72,9 @@ module.exports = function (data, options) {
   //Go through a partials object
 
   if (isPromise(data)) {
-    dependencies.push(data.tap(function (result) {
+    dependencies.push(data.then(function (result) {
       data = result;
+      return result;
     }));
   }
 
