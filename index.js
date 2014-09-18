@@ -26,13 +26,20 @@ function getNameFromPath(path) {
 function getPromiseFromPipe(pipe, fn) {
   var d = Promise.defer();
   pipe.pipe(through.obj(function (file, enc, cb) {
-    if (file.isNull()) return this.queue(file);
+    try {
+      if (file.isNull()) return this.queue(file);
 
-    var str = file.contents.toString();
-    fn(file, str);
-    d.resolve(str);
-    this.push(str);
+      var str = file.contents.toString();
+      fn(file, str);
+      this.push(str);
+    } catch(ex) {
+      this.emit('error', ex);
+    }
+
     cb();
+  }, function () {
+    //end
+    d.resolve();
   }));
   return d.promise;
 }

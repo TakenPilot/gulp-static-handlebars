@@ -80,4 +80,32 @@ describe('Gulp Static Handlebars', function () {
         done();
       });
   });
+
+  it('should not fail on no partial files', function (done) {
+    //arrange
+    var expectedContents = '<div>contents!</div>\n<div>Imported Helper</div>';
+
+    //act
+    fs.createReadStream('./test/fixtures/test-data-with-helper.html')
+      .pipe(handlebars({contents: "contents!"}, {helpers: gulp.src('./test/fixtures/something/**/*')}))
+      .on('data', function (data) {
+        expect(data).to.equal(expectedContents);
+      }).on('end', function () {
+        done();
+      });
+  });
+
+  it('should not fail on no helper files', function (done) {
+    //arrange
+    var expectedContents = '<div>contents!</div>\n<div>Imported Helper</div>';
+
+    //act
+    fs.createReadStream('./test/fixtures/test-data-with-helper.html')
+      .pipe(handlebars({contents: "contents!"}, {helpers: gulp.src('./test/fixtures/something/**/*')}))
+      .on('data', function (data) {
+        expect(data).to.equal(expectedContents);
+      }).on('end', function () {
+        done();
+      });
+  });
 });
