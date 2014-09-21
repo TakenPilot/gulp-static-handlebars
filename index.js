@@ -67,16 +67,23 @@ function getPromises(obj, fn) {
 }
 
 module.exports = function (data, options) {
+  var dataDependencies;
   options = options || {};
   var dependencies = [];
   //Go through a partials object
 
-  if (isPromise(data)) {
-    dependencies.push(data.then(function (result) {
-      data = result;
-      return result;
-    }));
+  if (data) {
+    if (isPromise(data)) {
+      dataDependencies = data.then(function (result) {
+        data = result;
+        return result;
+      });
+    } else {
+      dataDependencies = Promise.resolve(data);
+    }
+    dependencies.push(dataDependencies);
   }
+
 
   if (options.partials) {
     var partialDependencies = getPromises(options.partials, function (id, contents) {
@@ -91,12 +98,18 @@ module.exports = function (data, options) {
   if (options.helpers) {
     var helperDependencies = getPromises(options.helpers, function (id, contents) {
       if (isFile(id)) {
-        id = require(id.path);
-        contents = undefined;
-      } else if (_.isString(id)) {
+        var helperFile = require(id.path);
+        if (_.isFunction(helperFile)) {
+          Handlebars.registerHelper(getNameFromPath(id.path), helperFile);
+        } else if (_.isObject(helperFile)) {
+          _.each(helperFile, function(value, key) {
+            Handlebars.registerHelper(key, value);
+          });
+        }
+      } else if (_.isString(id) && _.isFunction(contents)) {
         id = id.toLowerCase();
+        Handlebars.registerHelper(id, contents);
       }
-      Handlebars.registerHelper(id, contents);
     });
     dependencies = dependencies.concat(helperDependencies);
   }
