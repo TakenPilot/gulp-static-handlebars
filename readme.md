@@ -3,6 +3,10 @@ Gulp Static Handlebars
 
 Reads partials and helpers from another source that can be asynchronous (like a database, file system, or promise).
 
+[![Code Climate](https://codeclimate.com/github/TakenPilot/gulp-static-handlebars/badges/gpa.svg)](https://codeclimate.com/github/TakenPilot/gulp-static-handlebars)
+
+[![Test Coverage](https://codeclimate.com/github/TakenPilot/gulp-static-handlebars/badges/coverage.svg)](https://codeclimate.com/github/TakenPilot/gulp-static-handlebars)
+
 ##Example with any A+ compatible promises library:
 
 ```JavaScript
