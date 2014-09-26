@@ -7,6 +7,8 @@ Reads partials and helpers from another source that can be asynchronous (like a 
 
 [![Test Coverage](https://codeclimate.com/github/TakenPilot/gulp-static-handlebars/badges/coverage.svg)](https://codeclimate.com/github/TakenPilot/gulp-static-handlebars)
 
+[![Coverage Status](https://img.shields.io/coveralls/TakenPilot/gulp-static-handlebars.svg)](https://coveralls.io/r/TakenPilot/gulp-static-handlebars?branch=master)
+
 ##Example with any A+ compatible promises library:
 
 ```JavaScript
