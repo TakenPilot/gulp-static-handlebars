@@ -27,7 +27,9 @@ function getPromiseFromPipe(pipe, fn) {
   var d = Promise.defer();
   pipe.pipe(through.obj(function (file, enc, cb) {
     try {
-      if (file.isNull()) return this.push(file);
+      if (file.isNull()) {
+        return this.push(file);
+      }
 
       var str = file.contents.toString();
       fn(file, str);
@@ -121,7 +123,7 @@ module.exports = function (data, options) {
       file.contents = new Buffer(Handlebars.compile(file.contents.toString())(data));
       self.push(file);
     }.bind(this)).catch(function (err) {
-      self.emit('error', new gutil.PluginError('gulp-static-handlebars', err))
+      self.emit('error', new gutil.PluginError('gulp-static-handlebars', err));
     }).finally(function () {
       callback();
     });
