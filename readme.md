@@ -46,19 +46,14 @@ gulp.src('./app/index.hbs')
 
 #Running Tests
 
-To run the basic tests, just run `mocha`.  
+To run the basic tests, just run `mocha` normally.  
 
-This assumes you've already install mocha globally and install the local npm packages:
+This assumes you've already installed the local npm packages:
 
-```Bash
+```Sh
+
 npm install
-npm install -g mocha
-```
 
-To run the coverage as well, you'll need to install the mocha-lcov-reporter:
-
-```Bash
-npm install -g mocha-lcov-reporter
 ```
 
 ##To Do:
