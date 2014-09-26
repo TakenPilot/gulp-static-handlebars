@@ -9,6 +9,8 @@ Reads partials and helpers from another source that can be asynchronous (like a 
 
 [![Coverage Status](https://img.shields.io/coveralls/TakenPilot/gulp-static-handlebars.svg)](https://coveralls.io/r/TakenPilot/gulp-static-handlebars?branch=master)
 
+[![Dependencies](https://david-dm.org/TakenPilot/gulp-static-handlebars.svg?style=flat)](https://david-dm.org/TakenPilot/gulp-static-handlebars.svg?style=flat)
+
 ##Example with any A+ compatible promises library:
 
 ```JavaScript
