@@ -42,6 +42,23 @@ gulp.src('./app/index.hbs')
 
 ```
 
+#Running Tests
+
+To run the basic tests, just run `mocha`.  
+
+This assumes you've already install mocha globally and install the local npm packages:
+
+```Bash
+npm install
+npm install -g mocha
+```
+
+To run the coverage as well, you'll need to install the mocha-lcov-reporter:
+
+```Bash
+npm install -g mocha-lcov-reporter
+```
+
 ##To Do:
 
 * Support more handlebars options
