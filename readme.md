@@ -1,7 +1,7 @@
 Gulp Static Handlebars
 ----------------------
 
-Reads partials and helpers from another source that can be asynchronous (like a database, file system, or promise).
+Reads data, partials and helpers from asynchronous sources like a databases, file systems, or promises.
 
 [![Build Status](https://travis-ci.org/TakenPilot/gulp-static-handlebars.svg?branch=master)](https://travis-ci.org/TakenPilot/gulp-static-handlebars)
 
