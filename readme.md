@@ -48,17 +48,19 @@ gulp.src('./app/index.hbs')
 
 ```
 
-#Running Tests
-
-To run the basic tests, just run `mocha` normally.  
-
-This assumes you've already installed the local npm packages:
+##Install
 
 ```Sh
 
-npm install
+npm install gulp-static-handlebars
 
 ```
+
+##Running Tests
+
+To run the basic tests, just run `mocha` normally.  
+
+This assumes you've already installed the local npm packages with `npm install`.
 
 ##To Do:
 
