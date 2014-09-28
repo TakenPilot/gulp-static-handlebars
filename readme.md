@@ -11,6 +11,8 @@ Reads partials and helpers from another source that can be asynchronous (like a 
 
 [![Dependencies](https://david-dm.org/TakenPilot/gulp-static-handlebars.svg?style=flat)](https://david-dm.org/TakenPilot/gulp-static-handlebars.svg?style=flat)
 
+[![NPM version](https://badge.fury.io/js/gulp-static-handlebars.svg)](http://badge.fury.io/js/gulp-static-handlebars)
+
 ##Example with any A+ compatible promises library:
 
 ```JavaScript
