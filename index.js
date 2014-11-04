@@ -3,6 +3,7 @@ var through = require('through2');
 var Handlebars = require('handlebars');
 var Promise = require('bluebird');
 var _ = require('lodash');
+var Path = require('path');
 
 /**
  * Duck-typing to allow different promise implementations to work.
@@ -20,7 +21,7 @@ function isFile(obj) {
 }
 
 function getNameFromPath(path) {
-  return path.split('/').pop().split('.').shift();
+  return path.split(Path.sep).pop().split('.').shift();
 }
 
 function getPromiseFromPipe(pipe, fn) {
