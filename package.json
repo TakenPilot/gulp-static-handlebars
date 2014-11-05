@@ -13,7 +13,14 @@
       "data-cover-never": "node_modules"
     }
   },
-  "keywords": ["gulpplugin", "handlebars", "static", "pipe","promise","async"],
+  "keywords": [
+    "gulpplugin",
+    "handlebars",
+    "static",
+    "pipe",
+    "promise",
+    "async"
+  ],
   "author": "Dane Stuckel",
   "license": "ISC",
   "dependencies": {
@@ -31,6 +38,8 @@
     "gulp-rename": "^1.2.0",
     "mocha": "^1.21.4",
     "mocha-lcov-reporter": "0.0.1",
-    "sinon": "^1.10.3"
+    "sinon": "^1.10.3",
+    "vinyl": "^0.4.3",
+    "vinyl-fs": "^0.3.11"
   }
 }

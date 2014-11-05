@@ -27,18 +27,9 @@ function getNameFromPath(path) {
 function getPromiseFromPipe(pipe, fn) {
   var d = Promise.defer();
   pipe.pipe(through.obj(function (file, enc, cb) {
-    try {
-      if (file.isNull()) {
-        return this.push(file);
-      }
-
-      var str = file.contents.toString();
-      fn(file, str);
-      this.push(file);
-    } catch(ex) {
-      this.emit('error', ex);
-    }
-
+    var str = file.contents.toString();
+    fn(file, str);
+    this.push(file);
     cb();
   }, function () {
     //end
@@ -55,8 +46,6 @@ function getPromises(obj, fn) {
           fn(name, partial);
           return partial;
         });
-      } else if (isPipe(result)) {
-        return getPromiseFromPipe(result, fn);
       } else if (_.isFunction(result)) {
         fn(name, result);
         return result;
@@ -130,3 +119,5 @@ module.exports = function (data, options) {
     });
   });
 };
+
+module.exports.Handlebars = Handlebars;
