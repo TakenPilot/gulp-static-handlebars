@@ -3,7 +3,9 @@ var Promise = require('bluebird'),
   expect = require('chai').expect,
   gulp = require('gulp'),
   rename = require('gulp-rename'),
-  File = require('vinyl');
+  File = require('vinyl'),
+  stream = require('stream'),
+  gUtil = require('gulp-util');
 
 describe('Gulp Static Handlebars', function () {
 
@@ -45,6 +47,66 @@ describe('Gulp Static Handlebars', function () {
         done();
       });
     deferred.resolve(partial);
+  });
+
+  it('should load more than highWaterMark:17 files', function (done) {
+    //arrange
+    var partial = '<div>Partial</div>';
+    var deferred = Promise.defer();
+    var lengthTest = 17;
+    var passThrough = new stream.PassThrough({highWaterMark: lengthTest, objectMode: true});
+
+    //act
+    passThrough
+      .pipe(handlebars({contents: "contents!!"}, {partials: {'test': deferred.promise}}))
+      .pipe(gUtil.buffer(function (err, files) {
+        expect(files).to.have.length(lengthTest);
+        done()
+      }));
+    deferred.resolve(partial);
+
+    for(var i = 0; i < lengthTest; i++) {
+      passThrough.push(new File({
+        path: "some/fake/path" + i + ".hbs",
+        contents: new Buffer("some fake {{contents}} " + i + "\n")
+      }));
+    }
+    passThrough.push(null);
+  });
+
+  it('should load more than highWaterMark:17 partials', function (done) {
+    //arrange
+    var i,
+      lengthTest = 17,
+      files = new stream.PassThrough({highWaterMark: lengthTest, objectMode: true}),
+      partials = new stream.PassThrough({highWaterMark: lengthTest, objectMode: true});
+
+    //act
+    files
+      .pipe(handlebars({contents: "contents!!"}, {partials: partials}))
+      .pipe(gUtil.buffer(function (err, files) {
+        expect(files).to.have.length(lengthTest);
+        files.forEach(function (file, index) {
+          expect(file.contents.toString()).to.equal("some fake some fake contents!! " + index + "\n " + index + "\n");
+        });
+        done();
+      }));
+
+    for(i = 0; i < lengthTest; i++) {
+      files.push(new File({
+        path: "some/fake/path" + i + ".html",
+        contents: new Buffer("some fake {{> partial" + i + "}} " + i + "\n")
+      }));
+    }
+    files.push(null);
+
+    for(i = 0; i < lengthTest; i++) {
+      partials.push(new File({
+        path: "some/fake/partial" + i + ".hbs",
+        contents: new Buffer("some fake {{contents}} " + i + "\n")
+      }));
+    }
+    partials.push(null);
   });
 
   it('should load data if promise', function (done) {
