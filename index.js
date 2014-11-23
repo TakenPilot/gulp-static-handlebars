@@ -4,6 +4,7 @@ var Handlebars = require('handlebars');
 var Promise = require('bluebird');
 var _ = require('lodash');
 var Path = require('path');
+var writable = require('./lib/writable');
 
 /**
  * Duck-typing to allow different promise implementations to work.
@@ -26,10 +27,9 @@ function getNameFromPath(path) {
 
 function getPromiseFromPipe(pipe, fn) {
   var d = Promise.defer();
-  pipe.pipe(through.obj(function (file, enc, cb) {
+  pipe.pipe(writable.obj(function (file, enc, cb) {
     var str = file.contents.toString();
     fn(file, str);
-    this.push(file);
     cb();
   }, function () {
     //end
