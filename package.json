@@ -1,6 +1,6 @@
 {
   "name": "gulp-static-handlebars",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Compile handlebars into static files, taking data, partials and helpers from outside sources like files, database, and json through callbacks and promises.",
   "main": "index.js",
   "repository": "http://github.com/TakenPilot/gulp-static-handlebars.git",
@@ -25,12 +25,12 @@
   "author": "Dane Stuckel",
   "license": "ISC",
   "dependencies": {
-    "bluebird": "^2.3.2",
-    "gulp-util": "^3.0.1",
+    "bluebird": "^2.9.3",
+    "gulp-util": "^3.0.2",
     "handlebars": "^2.0.0",
-    "lodash": "^2.4.1",
-    "readable-stream": "^1.0.33",
-    "through2": "^0.6.2"
+    "lodash": "^3.0.0",
+    "readable-stream": "^1.1.13",
+    "through2": "^0.6.3"
   },
   "devDependencies": {
     "blanket": "^1.1.6",
