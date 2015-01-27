@@ -34,14 +34,14 @@
   },
   "devDependencies": {
     "blanket": "^1.1.6",
-    "chai": "^1.9.1",
+    "chai": "^1.10.0",
     "coveralls": "^2.11.2",
-    "gulp": "^3.8.8",
+    "gulp": "^3.8.10",
     "gulp-rename": "^1.2.0",
-    "mocha": "^1.21.4",
+    "mocha": "^2.1.0",
     "mocha-lcov-reporter": "0.0.1",
-    "sinon": "^1.10.3",
-    "vinyl": "^0.4.3",
-    "vinyl-fs": "^0.3.11"
+    "sinon": "^1.12.2",
+    "vinyl": "^0.4.6",
+    "vinyl-fs": "^0.3.13"
   }
 }
