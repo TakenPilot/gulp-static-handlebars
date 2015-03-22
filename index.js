@@ -120,6 +120,6 @@ module.exports = function (data, options) {
   });
 };
 
-module.exports.registerWith = funciton (hbs) {
+module.exports.registerWith = function (hbs) {
   Handlebars = hbs;
 };
