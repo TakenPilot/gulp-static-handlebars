@@ -1,10 +1,10 @@
 var gutil = require('gulp-util');
 var through = require('through2');
-var Handlebars = require('handlebars');
 var Promise = require('bluebird');
 var _ = require('lodash');
 var Path = require('path');
 var writable = require('./lib/writable');
+var Handlebars = null;
 
 /**
  * Duck-typing to allow different promise implementations to work.
@@ -62,8 +62,8 @@ module.exports = function (data, options) {
   var dataDependencies;
   options = options || {};
   var dependencies = [];
+  Handlebars = Handlebars || require('handlebars');
   //Go through a partials object
-
   if (data) {
     if (isPromise(data)) {
       dataDependencies = data.then(function (result) {
@@ -120,4 +120,6 @@ module.exports = function (data, options) {
   });
 };
 
-module.exports.Handlebars = Handlebars;
+module.exports.registerWith = funciton (hbs) {
+  Handlebars = hbs;
+};
