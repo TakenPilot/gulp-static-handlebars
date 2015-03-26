@@ -49,11 +49,17 @@ function getPromises(obj, fn) {
       } else if (_.isFunction(result)) {
         fn(name, result);
         return result;
+      } else if (_.isString(result)){
+        fn(name, result);
       }
       return null;
     });
   } else if (isPipe(obj)) {
     return [getPromiseFromPipe(obj, fn)];
+  } else if (isPromise(obj)) {
+    obj.then(function (result) {
+      getPromises(result, fn);
+    })
   }
   return [];
 }

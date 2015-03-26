@@ -23,17 +23,20 @@ describe('Gulp Static Handlebars', function () {
     handlebars.Handlebars.unregisterHelper('helper-function-export');
     handlebars.Handlebars.unregisterHelper('test');
   });
-  
+
   describe('Helpers', function () {
-    it('es6 promises in object should load', function (done) {
-      //arrange
+    afterEach(function () {
+      handlebars.Handlebars.unregisterPartial('test');
+      handlebars.Handlebars.unregisterHelper('helper-function-export');
+      handlebars.Handlebars.unregisterHelper('test');
+    });
+
+    function promisesInObject(deferred, done) {
       var helper = function () {
           return 'HELPER';
         },
-        expectedContents = '<div>contents!!</div>\n<div>HELPER</div>';
-      var deferred = deferES6Promise();
+        expectedContents = '<div>contents!!</div>\n<div>HELPER</div>\n<div></div>';
 
-      //act
       gulp.src('./test/fixtures/test-data-with-helper.html')
         .pipe(handlebars({contents: "contents!!"}, {helpers: {'test': deferred.promise}}))
         .on('error', function (err) {
@@ -44,15 +47,26 @@ describe('Gulp Static Handlebars', function () {
           done();
         });
       deferred.resolve(helper);
+    }
+
+    it('es6 promises in object should load', function (done) {
+      var deferred = deferES6Promise();
+
+      promisesInObject(deferred, done);
     });
 
     it('bluebird promises in object should load', function (done) {
+      var deferred = bluebird.defer();
+
+      promisesInObject(deferred, done);
+    });
+
+    function promiseReturningObject(deferred, done) {
       //arrange
       var helper = function () {
           return 'HELPER';
         },
-        expectedContents = '<div>contents!!</div>\n<div>HELPER</div>';
-      var deferred = bluebird.defer();
+        expectedContents = '<div>contents!!</div>\n<div>HELPER</div>\n<div></div>';
 
       //act
       gulp.src('./test/fixtures/test-data-with-helper.html')
@@ -65,19 +79,27 @@ describe('Gulp Static Handlebars', function () {
           done();
         });
       deferred.resolve(helper);
+    }
+
+    it('es6 promise returning object should load', function (done) {
+      var deferred = deferES6Promise();
+
+      promiseReturningObject(deferred, done);
     });
 
     it('es6 promise returning object should load', function (done) {
+      var deferred = bluebird.defer();
+
+      promiseReturningObject(deferred, done);
+    });
+
+    it('pipe should load', function (done) {
       //arrange
-      var helper = function () {
-          return 'HELPER';
-        },
-        expectedContents = '<div>contents!!</div>\n<div>HELPER</div>';
-      var deferred = deferES6Promise();
+      var expectedContents = '<div>contents!</div>\n<div>Imported Helper</div>\n<div>Imported Single Helper</div>';
 
       //act
       gulp.src('./test/fixtures/test-data-with-helper.html')
-        .pipe(handlebars({contents: "contents!!"}, {helpers: {'test': deferred.promise}}))
+        .pipe(handlebars({contents: "contents!"}, {helpers: gulp.src('./test/fixtures/helpers/**/*')}))
         .on('error', function (err) {
           done(err);
         })
@@ -85,7 +107,31 @@ describe('Gulp Static Handlebars', function () {
           expect(data.contents.toString()).to.equal(expectedContents);
           done();
         });
-      deferred.resolve(helper);
+    });
+
+    it('should not fail on no helper files and no helper references', function (done) {
+      //arrange
+      var expectedContents = '<div>contents!</div>\n<div></div>\n<div></div>';
+
+      //act
+      gulp.src('./test/fixtures/test-data-with-helper.html')
+        .pipe(handlebars({contents: "contents!"}, {helpers: gulp.src('./test/fixtures/something/**/*')}))
+        .on('error', function (err) {
+          done(err);
+        })
+        .on('data', function (data) {
+          expect(data.contents.toString()).to.equal(expectedContents);
+        }).on('end', function () {
+          done();
+        });
+    });
+  });
+
+  describe('Partials', function () {
+    afterEach(function () {
+      handlebars.Handlebars.unregisterPartial('test');
+      handlebars.Handlebars.unregisterHelper('helper-function-export');
+      handlebars.Handlebars.unregisterHelper('test');
     });
 
     it('should load more than highWaterMark:17 files', function (done) {
@@ -148,87 +194,10 @@ describe('Gulp Static Handlebars', function () {
       partials.push(null);
     });
 
-    it('should load data if promise', function (done) {
-      //arrange
-      var expectedContents = '<div>Some dynamic content</div>';
-      var deferred = Promise.defer();
-
-      //act
-      gulp.src('./test/fixtures/test-data-with-helper.html')
-        .pipe(handlebars({contents: "contents!!"}, {helpers: deferred.promise}))
-        .on('error', function (err) {
-          done(err);
-        })
-        .on('data', function (data) {
-          expect(data.contents.toString()).to.equal(expectedContents);
-          done();
-        });
-      deferred.resolve(helper);
-    });
-
-    it('bluebird promise returning object should load', function (done) {
-      //arrange
-      var helper = function () {
-          return {
-            test: 'HELPER'
-          };
-        },
-        expectedContents = '<div>contents!!</div>\n<div>HELPER</div>';
-      var deferred = bluebird.defer();
-
-      //act
-      gulp.src('./test/fixtures/test-data-with-helper.html')
-        .pipe(handlebars({contents: "contents!!"}, {helpers: deferred.promise}))
-        .on('error', function (err) {
-          done(err);
-        })
-        .on('data', function (data) {
-          expect(data.contents.toString()).to.equal(expectedContents);
-          done();
-        });
-      deferred.resolve(helper);
-    });
-
-    it('pipe should load', function (done) {
-      //arrange
-      var expectedContents = '<div>contents!</div>\n<div>Imported Helper</div>';
-
-      //act
-      gulp.src('./test/fixtures/test-data-with-helper.html')
-        .pipe(handlebars({contents: "contents!"}, {helpers: gulp.src('./test/fixtures/helpers/**/*')}))
-        .on('error', function (err) {
-          done(err);
-        })
-        .on('data', function (data) {
-          expect(data.contents.toString()).to.equal(expectedContents);
-          done();
-        });
-    });
-
-    it('should not fail on no helper files and no helper references', function (done) {
-      //arrange
-      var expectedContents = '<div>contents!</div>\n<div>Imported Helper</div>';
-
-      //act
-      gulp.src('./test/fixtures/test-data-with-helper.html')
-        .pipe(handlebars({contents: "contents!"}, {helpers: gulp.src('./test/fixtures/something/**/*')}))
-        .on('error', function (err) {
-          done(err);
-        })
-        .on('data', function (data) {
-          expect(data.contents.toString()).to.equal(expectedContents);
-        }).on('end', function () {
-          done();
-        });
-    });
-  });
-
-  describe('Partials', function () {
-    it('es6 promises in object should load', function (done) {
+    function promisesInObject(deferred, done) {
       //arrange
       var partial = '<div>Partial</div>',
         expectedContents = '<div>contents!!</div>\n<div><div>Partial</div></div>';
-      var deferred = deferES6Promise();
 
       //act
       gulp.src('./test/fixtures/test-data-with-partial.html')
@@ -241,34 +210,26 @@ describe('Gulp Static Handlebars', function () {
           done();
         });
       deferred.resolve(partial);
+    }
+
+    it('es6 promises in object should load', function (done) {
+      var deferred = deferES6Promise();
+
+      promisesInObject(deferred, done);
     });
 
     it('bluebird promises in object should load', function (done) {
-      //arrange
-      var partial = '<div>Partial</div>',
-        expectedContents = '<div>contents!!</div>\n<div><div>Partial</div></div>';
       var deferred = bluebird.defer();
 
-      //act
-      gulp.src('./test/fixtures/test-data-with-partial.html')
-        .pipe(handlebars({contents: "contents!!"}, {partials: {'test': deferred.promise}}))
-        .on('error', function (err) {
-          done(err);
-        })
-        .on('data', function (data) {
-          expect(data.contents.toString()).to.equal(expectedContents);
-          done();
-        });
-      deferred.resolve(partial);
+      promisesInObject(deferred, done);
     });
 
-    it('es6 promise returning object should load', function (done) {
+    function promiseReturningObject(deferred, done) {
       //arrange
       var partial = {
           test: '<div>Partial</div>'
         },
         expectedContents = '<div>contents!!</div>\n<div><div>Partial</div></div>';
-      var deferred = deferES6Promise();
 
       //act
       gulp.src('./test/fixtures/test-data-with-partial.html')
@@ -281,27 +242,18 @@ describe('Gulp Static Handlebars', function () {
           done();
         });
       deferred.resolve(partial);
+    }
+
+    it('es6 promise returning object should load', function (done) {
+      var deferred = deferES6Promise();
+
+      promiseReturningObject(deferred, done);
     });
 
     it('bluebird promise returning object should load', function (done) {
-      //arrange
-      var partial = {
-          test: '<div>Partial</div>'
-        },
-        expectedContents = '<div>contents!!</div>\n<div><div>Partial</div></div>';
       var deferred = bluebird.defer();
 
-      //act
-      gulp.src('./test/fixtures/test-data-with-partial.html')
-        .pipe(handlebars({contents: "contents!!"}, {partials: deferred.promise}))
-        .on('error', function (err) {
-          done(err);
-        })
-        .on('data', function (data) {
-          expect(data.contents.toString()).to.equal(expectedContents);
-          done();
-        });
-      deferred.resolve(partial);
+      promiseReturningObject(deferred, done);
     });
 
     it('pipe should load', function (done) {
@@ -322,10 +274,10 @@ describe('Gulp Static Handlebars', function () {
 
     it('should not fail on no partial files and no partial references', function (done) {
       //arrange
-      var expectedContents = '<div>contents!</div>\n<div><test>partial 1 contents!</test></div>';
+      var expectedContents = '<div>contents!</div>';
 
       //act
-      gulp.src('./test/fixtures/test-data-with-partial.html')
+      gulp.src('./test/fixtures/test-data.html')
         .pipe(handlebars({contents: "contents!"}, {partials: gulp.src('./test/fixtures/something/**/*')}))
         .on('error', function (err) {
           done(err);
@@ -337,9 +289,32 @@ describe('Gulp Static Handlebars', function () {
           done();
         });
     });
+
+    it('should fail on no partial files and partial references', function (done) {
+      //arrange
+      var expectedContents = '<div>contents!</div>\n<div><test>partial 1 contents!</test></div>';
+
+      //act
+      gulp.src('./test/fixtures/test-data-with-partial.html')
+        .pipe(handlebars({contents: "contents!"}, {partials: gulp.src('./test/fixtures/something/**/*')}))
+        .on('error', function (err) {
+          expect(err).to.be.instanceOf(Error);
+          done();
+        })
+        .on('data', function (data) {
+          //should not happen
+          done(data);
+        });
+    });
   });
 
   describe('Data', function () {
+    afterEach(function () {
+      handlebars.Handlebars.unregisterPartial('test');
+      handlebars.Handlebars.unregisterHelper('helper-function-export');
+      handlebars.Handlebars.unregisterHelper('test');
+    });
+
     it('es6 promises should load', function (done) {
       //arrange
       var data = {contents: "Some dynamic content"},
@@ -453,7 +428,7 @@ describe('Gulp Static Handlebars', function () {
     //act
     gulp.src('./test/fixtures/test-data-with-partial.html')
       .pipe(handlebars({contents: "contents!!"}, {partials: {
-        'test': Promise.delay('immediate data', 50)
+        'test': bluebird.delay('immediate data', 50)
       }}))
       .on('data', function (data) {
         expect(data.contents.toString()).to.equal(expectedContents);
@@ -466,7 +441,10 @@ describe('Gulp Static Handlebars', function () {
       .pipe(handlebars({contents: "contents!!"}, {partials: {
         'test': 'things'
       }}))
-      .on('error', function () {
+      .on('data', function (result) {
+        expect(result).to.be.instanceOf(File);
+      })
+      .on('end', function () {
         done();
       });
   });
