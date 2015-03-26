@@ -126,6 +126,12 @@ module.exports = function (data, options) {
   });
 };
 
+
+module.exports.getHandlebars = function () {
+  Handlebars = Handlebars || require('handlebars');
+  return Handlebars;
+};
+
 module.exports.use = function (customHandlebars) {
   Handlebars = customHandlebars;
 };
