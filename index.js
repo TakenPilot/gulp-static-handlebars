@@ -127,7 +127,7 @@ module.exports = function (data, options) {
 };
 
 
-module.exports.getHandlebars = function () {
+module.exports.using = function () {
   Handlebars = Handlebars || require('handlebars');
   return Handlebars;
 };
