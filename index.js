@@ -59,7 +59,7 @@ function getPromises(obj, fn) {
   } else if (isPromise(obj)) {
     obj.then(function (result) {
       getPromises(result, fn);
-    })
+    });
   }
   return [];
 }
@@ -126,6 +126,6 @@ module.exports = function (data, options) {
   });
 };
 
-module.exports.registerWith = function (hbs) {
-  Handlebars = hbs;
+module.exports.registerWith = function (CustomHandlebars) {
+  Handlebars = CustomHandlebars;
 };
