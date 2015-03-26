@@ -126,6 +126,6 @@ module.exports = function (data, options) {
   });
 };
 
-module.exports.registerWith = function (CustomHandlebars) {
-  Handlebars = CustomHandlebars;
+module.exports.use = function (customHandlebars) {
+  Handlebars = customHandlebars;
 };
