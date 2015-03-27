@@ -13,7 +13,7 @@ Reads data, partials and helpers from asynchronous sources like a databases, fil
 
 [![NPM version](https://badge.fury.io/js/gulp-static-handlebars.svg)](http://badge.fury.io/js/gulp-static-handlebars)
 
-##Example with any A+ compatible promises library:
+## Example with any A+ compatible promises library:
 
 ```JavaScript
 
@@ -35,7 +35,7 @@ gulp.src('./app/index.hbs')
       
 ```
 
-##Another example with vinyl pipes
+## Another example with vinyl pipes
 
 ```JavaScript
 
@@ -48,7 +48,7 @@ gulp.src('./app/index.hbs')
 
 ```
 
-##Install
+## Install
 
 ```Sh
 
@@ -56,12 +56,12 @@ npm install gulp-static-handlebars
 
 ```
 
-##Running Tests
+## Running Tests
 
 To run the basic tests, just run `mocha` normally.  
 
 This assumes you've already installed the local npm packages with `npm install`.
 
-##To Do:
+## To Do:
 
 * Support more handlebars options
