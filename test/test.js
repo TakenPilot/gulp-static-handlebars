@@ -8,6 +8,9 @@ var bluebird = require('bluebird'),
   stream = require('stream'),
   gUtil = require('gulp-util');
 
+/**
+ * Defer resolution for ES6 promises
+ */
 function deferES6Promise() {
   var defer = {};
   defer.promise = new es6Promise(function (resolve, reject) {
@@ -17,18 +20,35 @@ function deferES6Promise() {
   return defer;
 }
 
+/**
+ * Clear away all the helpers and partials that we may create in our tests.
+ */
+function clearHandlebars() {
+  handlebars.Handlebars.unregisterPartial('test');
+  handlebars.Handlebars.unregisterHelper('helper-function-export');
+  handlebars.Handlebars.unregisterHelper('test');
+}
+
+/**
+ * Create a new null file
+ */
+function createNullFile() {
+  return new File({
+    cwd: "/",
+    base: "/test/",
+    path: "/test/whatever",
+    contents: null
+  });
+}
+
 describe('Gulp Static Handlebars', function () {
   afterEach(function () {
-    handlebars.Handlebars.unregisterPartial('test');
-    handlebars.Handlebars.unregisterHelper('helper-function-export');
-    handlebars.Handlebars.unregisterHelper('test');
+    clearHandlebars();
   });
 
   describe('Helpers', function () {
     afterEach(function () {
-      handlebars.Handlebars.unregisterPartial('test');
-      handlebars.Handlebars.unregisterHelper('helper-function-export');
-      handlebars.Handlebars.unregisterHelper('test');
+      clearHandlebars();
     });
 
     function promisesInObject(deferred, done) {
@@ -87,7 +107,7 @@ describe('Gulp Static Handlebars', function () {
       promiseReturningObject(deferred, done);
     });
 
-    it('es6 promise returning object should load', function (done) {
+    it('bluebird returning object should load', function (done) {
       var deferred = bluebird.defer();
 
       promiseReturningObject(deferred, done);
@@ -109,19 +129,13 @@ describe('Gulp Static Handlebars', function () {
         });
     });
 
-    it('should not fail on no helper files and no helper references', function (done) {
-      //arrange
-      var expectedContents = '<div>contents!</div>\n<div></div>\n<div></div>';
+    it('should ignore null files as helpers', function (done) {
+      var nullFile = createNullFile();
 
-      //act
-      gulp.src('./test/fixtures/test-data-with-helper.html')
-        .pipe(handlebars({contents: "contents!"}, {helpers: gulp.src('./test/fixtures/something/**/*')}))
-        .on('error', function (err) {
-          done(err);
-        })
-        .on('data', function (data) {
-          expect(data.contents.toString()).to.equal(expectedContents);
-        }).on('end', function () {
+      gulp.src('./test/fixtures/test-data.html')
+        .pipe(handlebars({contents: "contents!!"}, {helpers: nullFile}))
+        .on('data', function () {})
+        .on('end', function () {
           done();
         });
     });
@@ -129,9 +143,7 @@ describe('Gulp Static Handlebars', function () {
 
   describe('Partials', function () {
     afterEach(function () {
-      handlebars.Handlebars.unregisterPartial('test');
-      handlebars.Handlebars.unregisterHelper('helper-function-export');
-      handlebars.Handlebars.unregisterHelper('test');
+      clearHandlebars();
     });
 
     it('should load more than highWaterMark:17 files', function (done) {
@@ -192,6 +204,14 @@ describe('Gulp Static Handlebars', function () {
         }));
       }
       partials.push(null);
+    });
+
+    it('should not load partials from arrays (must have a name for each partial)', function (done) {
+      gulp.src('./test/fixtures/test-data-with-partial.html')
+        .pipe(handlebars({contents: "contents!!"}, {partials: ['things']}))
+        .on('error', function () {
+          done();
+        });
     });
 
     function promisesInObject(deferred, done) {
@@ -256,6 +276,34 @@ describe('Gulp Static Handlebars', function () {
       promiseReturningObject(deferred, done);
     });
 
+    it('plain mapped strings should load', function (done) {
+      gulp.src('./test/fixtures/test-data-with-partial.html')
+        .pipe(handlebars({contents: "contents!!"}, {partials: {
+          'test': 'things'
+        }}))
+        .on('data', function (result) {
+          expect(result).to.be.instanceOf(File);
+        })
+        .on('end', function () {
+          done();
+        });
+    });
+
+    it('inline functions should load ', function (done) {
+      //arrange
+      var expectedContents = '<div>contents!!</div>\n<div>immediate data</div>';
+
+      //act
+      gulp.src('./test/fixtures/test-data-with-partial.html')
+        .pipe(handlebars({contents: "contents!!"}, {partials: {
+          'test': function () { return 'immediate data'; }
+        }}))
+        .on('data', function (data) {
+          expect(data.contents.toString()).to.equal(expectedContents);
+          done();
+        });
+    });
+
     it('pipe should load', function (done) {
       //arrange
       var expectedContents = '<div>contents!!</div>\n<div><test>partial 1 contents!!</test></div>';
@@ -306,13 +354,22 @@ describe('Gulp Static Handlebars', function () {
           done(data);
         });
     });
+
+    it('should ignore null files as partials', function (done) {
+      var nullFile = createNullFile();
+
+      gulp.src('./test/fixtures/test-data.html')
+        .pipe(handlebars({contents: "contents!!"}, {partials: nullFile}))
+        .on('data', function () {})
+        .on('end', function () {
+          done();
+        });
+    });
   });
 
   describe('Data', function () {
     afterEach(function () {
-      handlebars.Handlebars.unregisterPartial('test');
-      handlebars.Handlebars.unregisterHelper('helper-function-export');
-      handlebars.Handlebars.unregisterHelper('test');
+      clearHandlebars();
     });
 
     it('es6 promises should load', function (done) {
@@ -390,113 +447,23 @@ describe('Gulp Static Handlebars', function () {
         });
       deferred.resolve(data);
     });
-  });
 
-  it('can load helper file exporting single function using filename as name of helper', function (done) {
-    //arrange
-    var expectedContents = '<div>contents!</div>\n<div></div>\n<div>Imported Single Helper</div>';
+    it('should ignore null files as data', function (done) {
+      var nullFile = createNullFile();
 
-    //act
-    gulp.src('./test/fixtures/test-data-with-helper.html')
-      .pipe(handlebars({contents: "contents!"}, {helpers: gulp.src('./test/fixtures/helpers/helper-function-export.js')}))
-      .on('data', function (data) {
-        expect(data.contents.toString()).to.equal(expectedContents);
-      }).on('end', function () {
-        done();
-      });
-  });
-
-  it('should load partials from data from inline functions', function (done) {
-    //arrange
-    var expectedContents = '<div>contents!!</div>\n<div>immediate data</div>';
-
-    //act
-    gulp.src('./test/fixtures/test-data-with-partial.html')
-      .pipe(handlebars({contents: "contents!!"}, {partials: {
-        'test': function () { return 'immediate data'; }
-      }}))
-      .on('data', function (data) {
-        expect(data.contents.toString()).to.equal(expectedContents);
-        done();
-      });
-  });
-
-  it('should load partials from data from mapped promises', function (done) {
-    //arrange
-    var expectedContents = '<div>contents!!</div>\n<div>immediate data</div>';
-
-    //act
-    gulp.src('./test/fixtures/test-data-with-partial.html')
-      .pipe(handlebars({contents: "contents!!"}, {partials: {
-        'test': bluebird.delay('immediate data', 50)
-      }}))
-      .on('data', function (data) {
-        expect(data.contents.toString()).to.equal(expectedContents);
-        done();
-      });
-  });
-
-  it('should not load partials from plain mapped strings (must have scope)', function (done) {
-    gulp.src('./test/fixtures/test-data-with-partial.html')
-      .pipe(handlebars({contents: "contents!!"}, {partials: {
-        'test': 'things'
-      }}))
-      .on('data', function (result) {
-        expect(result).to.be.instanceOf(File);
-      })
-      .on('end', function () {
-        done();
-      });
-  });
-
-  it('should not load partials from arrays (must have a name for each partial)', function (done) {
-    gulp.src('./test/fixtures/test-data-with-partial.html')
-      .pipe(handlebars({contents: "contents!!"}, {partials: ['things']}))
-      .on('error', function () {
-        done();
-      });
-  });
-
-  it('should ignore null files as data', function (done) {
-    var f = new File();
-    gulp.src('./test/fixtures/test-data.html')
-      .pipe(handlebars(f))
-      .on('data', function () {})
-      .on('end', function () {
-        done();
-      });
-  });
-
-  it('should ignore null files as partials', function (done) {
-    var f = new File({
-      cwd: "/",
-      base: "/test/",
-      path: "/test/whatever",
-      contents: null
+      gulp.src('./test/fixtures/test-data.html')
+        .pipe(handlebars(nullFile))
+        .on('data', function () {})
+        .on('end', function () {
+          done();
+        });
     });
-    gulp.src('./test/fixtures/test-data.html')
-      .pipe(handlebars({contents: "contents!!"}, {partials: f}))
-      .on('data', function () {})
-      .on('end', function () {
-        done();
-      });
   });
 
-  it('should ignore null files as helpers', function (done) {
-    var f = new File({
-      cwd: "/",
-      base: "/test/",
-      path: "/test/whatever",
-      contents: null
-    });
-    gulp.src('./test/fixtures/test-data.html')
-      .pipe(handlebars({contents: "contents!!"}, {helpers: f}))
-      .on('data', function () {})
-      .on('end', function () {
-        done();
-      });
-  });
-
+  /**
+   * If we can use gulp-rename afterward, then we're passing all the correct data for vinyl files that other gulp
+   * plugins need.
+   */
   it('can rename files afterward', function (done) {
     //arrange
     var expectedContents = '<div>contents!</div>\n<div><test>partial 1 contents!</test></div>';

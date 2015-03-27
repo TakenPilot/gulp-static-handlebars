@@ -25,12 +25,12 @@
   "author": "Dane Stuckel",
   "license": "ISC",
   "dependencies": {
-    "bluebird": "^2.9.3",
-    "gulp-util": "^3.0.2",
-    "handlebars": "^2.0.0",
-    "lodash": "^3.0.0",
-    "readable-stream": "^1.1.13",
-    "through2": "^0.6.3"
+    "bluebird": "^2.9",
+    "gulp-util": "^3.0",
+    "handlebars": ">=2",
+    "lodash": ">=2",
+    "readable-stream": "^1.1",
+    "through2": "^0.6"
   },
   "devDependencies": {
     "blanket": "^1.1.6",
