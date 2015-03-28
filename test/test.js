@@ -149,7 +149,7 @@ describe('Gulp Static Handlebars', function () {
     it('should load more than highWaterMark:17 files', function (done) {
       //arrange
       var partial = '<div>Partial</div>';
-      var deferred = Promise.defer();
+      var deferred = bluebird.defer();
       var lengthTest = 17;
       var passThrough = new stream.PassThrough({highWaterMark: lengthTest, objectMode: true});
 
