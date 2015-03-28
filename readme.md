@@ -32,7 +32,7 @@ function getPartials() {
 gulp.src('./app/index.hbs')
       .pipe(handlebars(getData(), {helpers: getHelpers(), partials: getPartials()}))
       .pipe(gulp.dest('./dist'));
-      
+
 ```
 
 ## Another example with vinyl pipes
@@ -48,6 +48,15 @@ gulp.src('./app/index.hbs')
 
 ```
 
+## Get/Set Handlebars Instance
+```JavaScript
+
+var MyHandlebars = handlebars.instance() // get Handlebars
+handlebars.instance(MyHandlebars) // use another Handlebars instance
+
+```
+
+
 ## Install
 
 ```Sh
@@ -58,7 +67,7 @@ npm install gulp-static-handlebars
 
 ## Running Tests
 
-To run the basic tests, just run `mocha` normally.  
+To run the basic tests, just run `mocha` normally.
 
 This assumes you've already installed the local npm packages with `npm install`.
 
