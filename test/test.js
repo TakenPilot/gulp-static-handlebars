@@ -24,9 +24,9 @@ function deferES6Promise() {
  * Clear away all the helpers and partials that we may create in our tests.
  */
 function clearHandlebars() {
-  handlebars.Handlebars.unregisterPartial('test');
-  handlebars.Handlebars.unregisterHelper('helper-function-export');
-  handlebars.Handlebars.unregisterHelper('test');
+  handlebars.instance().unregisterPartial('test');
+  handlebars.instance().unregisterHelper('helper-function-export');
+  handlebars.instance().unregisterHelper('test');
 }
 
 /**
@@ -158,7 +158,7 @@ describe('Gulp Static Handlebars', function () {
         .pipe(handlebars({contents: "contents!!"}, {partials: {'test': deferred.promise}}))
         .pipe(gUtil.buffer(function (err, files) {
           expect(files).to.have.length(lengthTest);
-          done()
+          done();
         }));
       deferred.resolve(partial);
 
@@ -485,4 +485,15 @@ describe('Gulp Static Handlebars', function () {
         done();
       });
   });
+
+  it('can use another Handlebars instance', function (done) {
+    var Handlebars = {
+      'test' : 'Handlebars'
+    };
+    handlebars.instance(Handlebars);
+    expect(Handlebars).to.be.equal(handlebars.instance());
+    handlebars.instance(null); // use default
+    done();
+  });
+
 });

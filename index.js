@@ -1,6 +1,6 @@
 var gutil = require('gulp-util');
 var through = require('through2');
-var Handlebars = require('handlebars');
+var Handlebars = null;
 var Promise = require('bluebird');
 var _ = require('lodash');
 var Path = require('path');
@@ -59,7 +59,7 @@ function getPromises(obj, fn) {
   } else if (isPromise(obj)) {
     obj.then(function (result) {
       getPromises(result, fn);
-    })
+    });
   }
   return [];
 }
@@ -68,6 +68,7 @@ module.exports = function (data, options) {
   var dataDependencies;
   options = options || {};
   var dependencies = [];
+  Handlebars = instance();
   //Go through a partials object
 
   if (data) {
@@ -126,4 +127,15 @@ module.exports = function (data, options) {
   });
 };
 
-module.exports.Handlebars = Handlebars;
+function instance(handlebarsInstance) {
+  if (arguments.length == 1) {
+    Handlebars = handlebarsInstance;
+  } else {
+    if (!Handlebars) {
+      Handlebars = require('handlebars');
+    }
+  }
+  return Handlebars;
+}
+
+module.exports.instance = instance;
