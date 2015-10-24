@@ -27,8 +27,8 @@
   "dependencies": {
     "bluebird": "^2.9",
     "gulp-util": "^3.0",
-    "handlebars": ">=2",
-    "lodash": ">=2",
+    "handlebars": "^4.0",
+    "lodash": "^3.0",
     "readable-stream": "^2.0",
     "through2": "^2.0"
   },
@@ -39,7 +39,7 @@
     "es6-promise": "^3.0",
     "gulp": "^3.8",
     "gulp-rename": "^1.2.0",
-    "mocha": "2.1",
+    "mocha": "^2.1",
     "mocha-lcov-reporter": "^1.0",
     "sinon": "^1.12",
     "vinyl": "^1.0",
