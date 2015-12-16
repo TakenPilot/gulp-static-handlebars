@@ -115,6 +115,7 @@ module.exports = function (data, options) {
 
 
   return through.obj(function (file, enc, callback) {
+    data._file = file; // I use the underscore on case of naming conflict
     var self = this;
     Promise.all(dependencies).then(function () {
       file.contents = new Buffer(Handlebars.compile(file.contents.toString())(data));
