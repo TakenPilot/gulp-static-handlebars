@@ -124,6 +124,7 @@ module.exports = function (data, options) {
       var tpl = Handlebars.compile(file.contents.toString());
 
       if( pages == null ) {
+        data._file = file;
         file.contents = new Buffer(tpl(data));
         self.push(file);
       } else {
