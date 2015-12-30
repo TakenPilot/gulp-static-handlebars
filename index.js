@@ -5,6 +5,7 @@ var Promise = require('bluebird');
 var _ = require('lodash');
 var Path = require('path');
 var writable = require('./lib/writable');
+var path = require('path');
 
 /**
  * Duck-typing to allow different promise implementations to work.
@@ -67,6 +68,7 @@ function getPromises(obj, fn) {
 module.exports = function (data, options) {
   var dataDependencies;
   options = options || {};
+  options.pages || {};
   var dependencies = [];
   Handlebars = instance();
   //Go through a partials object
@@ -115,11 +117,27 @@ module.exports = function (data, options) {
 
 
   return through.obj(function (file, enc, callback) {
-    data._file = file; // I use the underscore on case of naming conflict
     var self = this;
     Promise.all(dependencies).then(function () {
-      file.contents = new Buffer(Handlebars.compile(file.contents.toString())(data));
-      self.push(file);
+      var parsedPath = path.parse(file.path);
+      var pages = options.pages[ parsedPath.base ];
+      var tpl = Handlebars.compile(file.contents.toString());
+
+      if( pages == null ) {
+        file.contents = new Buffer(tpl(data));
+        self.push(file);
+      } else {
+        pages.forEach(function (pageName, i) {
+          var pageFile = file.clone();
+          parsedPath.base = pageName;
+          pageFile.path = path.format(parsedPath);
+          data._pageNum = i;
+          data._file = pageFile;
+
+          pageFile.contents = new Buffer(tpl(data));
+          self.push(pageFile);
+        });
+      }
     }.bind(this)).catch(function (err) {
       self.emit('error', new gutil.PluginError('gulp-static-handlebars', err));
     }).finally(function () {
