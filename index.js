@@ -5,7 +5,6 @@ var Promise = require('bluebird');
 var _ = require('lodash');
 var Path = require('path');
 var writable = require('./lib/writable');
-var path = require('path');
 
 /**
  * Duck-typing to allow different promise implementations to work.
@@ -66,14 +65,14 @@ function getPromises(obj, fn) {
 }
 
 module.exports = function (data, options) {
-  var dataDependencies;
   options = options || {};
-  options.pages || {};
   var dependencies = [];
   Handlebars = instance();
+  var render = options.render || defaultRender;
   //Go through a partials object
 
   if (data) {
+    var dataDependencies;
     if (isPromise(data)) {
       dataDependencies = data.then(function (result) {
         data = result;
@@ -95,6 +94,7 @@ module.exports = function (data, options) {
     });
     dependencies = dependencies.concat(partialDependencies);
   }
+
   //Go through a helpers object
   if (options.helpers) {
     var helperDependencies = getPromises(options.helpers, function (id, contents) {
@@ -115,30 +115,12 @@ module.exports = function (data, options) {
     dependencies = dependencies.concat(helperDependencies);
   }
 
-
   return through.obj(function (file, enc, callback) {
     var self = this;
     Promise.all(dependencies).then(function () {
-      var parsedPath = path.parse(file.path);
-      var pages = options.pages[ parsedPath.base ];
       var tpl = Handlebars.compile(file.contents.toString());
+      render.call( this, tpl, data, file );
 
-      if( pages == null ) {
-        data._file = file;
-        file.contents = new Buffer(tpl(data));
-        self.push(file);
-      } else {
-        pages.forEach(function (pageName, i) {
-          var pageFile = file.clone();
-          parsedPath.base = pageName;
-          pageFile.path = path.format(parsedPath);
-          data._pageNum = i;
-          data._file = pageFile;
-
-          pageFile.contents = new Buffer(tpl(data));
-          self.push(pageFile);
-        });
-      }
     }.bind(this)).catch(function (err) {
       self.emit('error', new gutil.PluginError('gulp-static-handlebars', err));
     }).finally(function () {
@@ -156,6 +138,11 @@ function instance(handlebarsInstance) {
     }
   }
   return Handlebars;
+}
+
+function defaultRender(tpl, data, file) {
+  file.contents = new Buffer(tpl(data));
+  this.push(file);
 }
 
 module.exports.instance = instance;
