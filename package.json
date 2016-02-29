@@ -1,6 +1,6 @@
 {
   "name": "gulp-static-handlebars",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Compile handlebars into static files, taking data, partials and helpers from outside sources like files, database, and json through callbacks and promises.",
   "main": "index.js",
   "repository": "http://github.com/TakenPilot/gulp-static-handlebars.git",
