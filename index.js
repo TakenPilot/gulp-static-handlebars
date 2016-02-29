@@ -65,13 +65,14 @@ function getPromises(obj, fn) {
 }
 
 module.exports = function (data, options) {
-  var dataDependencies;
   options = options || {};
   var dependencies = [];
   Handlebars = instance();
+  var render = options.render || defaultRender;
   //Go through a partials object
 
   if (data) {
+    var dataDependencies;
     if (isPromise(data)) {
       dataDependencies = data.then(function (result) {
         data = result;
@@ -93,6 +94,7 @@ module.exports = function (data, options) {
     });
     dependencies = dependencies.concat(partialDependencies);
   }
+
   //Go through a helpers object
   if (options.helpers) {
     var helperDependencies = getPromises(options.helpers, function (id, contents) {
@@ -113,12 +115,12 @@ module.exports = function (data, options) {
     dependencies = dependencies.concat(helperDependencies);
   }
 
-
   return through.obj(function (file, enc, callback) {
     var self = this;
     Promise.all(dependencies).then(function () {
-      file.contents = new Buffer(Handlebars.compile(file.contents.toString())(data));
-      self.push(file);
+      var tpl = Handlebars.compile(file.contents.toString());
+      render.call( this, tpl, data, file );
+
     }.bind(this)).catch(function (err) {
       self.emit('error', new gutil.PluginError('gulp-static-handlebars', err));
     }).finally(function () {
@@ -136,6 +138,11 @@ function instance(handlebarsInstance) {
     }
   }
   return Handlebars;
+}
+
+function defaultRender(tpl, data, file) {
+  file.contents = new Buffer(tpl(data));
+  this.push(file);
 }
 
 module.exports.instance = instance;
