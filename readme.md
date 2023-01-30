@@ -1,6 +1,9 @@
 Gulp Static Handlebars
 ----------------------
 
+> **⚠ Warning**
+> This library is deprecated. The underlying libraries that this package relies on are either unmaintained or have security warnings. I'm deprecating this project until someone rewrites it with modern tooling.
+
 Reads data, partials and helpers from asynchronous sources like a databases, file systems, or promises.
 
 [![Build Status](https://travis-ci.org/TakenPilot/gulp-static-handlebars.svg?branch=master)](https://travis-ci.org/TakenPilot/gulp-static-handlebars)
